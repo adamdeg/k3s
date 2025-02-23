@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
 
 env: 
-  HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
-  SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+  TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
+  TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
 
 jobs:
   plan:
@@ -26,15 +26,10 @@ jobs:
       working-directory: terraform
       run: terraform init
 
-    - name: Debug Environment Variables
-      run: |
-        echo "HCLOUD_TOKEN Length: $(echo -n "${HCLOUD_TOKEN}" | wc -c)"
-        echo "SSH_PUBLIC_KEY Length: $(echo -n "${SSH_PUBLIC_KEY}" | wc -c)"
-
     - name: Plan Terraform Deployment
       working-directory: terraform
       run: |
-        terraform plan -var="hcloud_token=${HCLOUD_TOKEN}" -var="ssh_public_key=${SSH_PUBLIC_KEY}"
+        terraform plan
 
   apply:
     name: 'Terraform apply'
@@ -58,4 +53,4 @@ jobs:
     - name: Apply Terraform Configuration
       working-directory: terraform
       run: |
-        terraform apply -auto-approve -var="hcloud_token=${HCLOUD_TOKEN}" -var="ssh_public_key=${SSH_PUBLIC_KEY}"
+        terraform apply -auto-approve
