@@ -8,10 +8,6 @@ env:
   HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
   SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
 
-  defaults:
-    run:
-      shell: bash
-
 jobs:
   plan:
     name: 'Terraform plan'
@@ -32,13 +28,13 @@ jobs:
 
     - name: Debug Environment Variables
       run: |
-        echo 'HCLOUD_TOKEN Length: $(echo -n "$HCLOUD_TOKEN" | wc -c)'
-        echo 'SSH_PUBLIC_KEY Length: $(echo -n "$SSH_PUBLIC_KEY" | wc -c)'
+        echo "HCLOUD_TOKEN Length: $(echo -n "${HCLOUD_TOKEN}" | wc -c)"
+        echo "SSH_PUBLIC_KEY Length: $(echo -n "${SSH_PUBLIC_KEY}" | wc -c)"
 
     - name: Plan Terraform Deployment
       working-directory: terraform
       run: |
-        terraform plan -var='hcloud_token="$HCLOUD_TOKEN"' -var='ssh_public_key="$SSH_PUBLIC_KEY"'
+        terraform plan -var="hcloud_token=${HCLOUD_TOKEN}" -var="ssh_public_key=${SSH_PUBLIC_KEY}"
 
   apply:
     name: 'Terraform apply'
@@ -62,4 +58,4 @@ jobs:
     - name: Apply Terraform Configuration
       working-directory: terraform
       run: |
-        terraform apply -auto-approve -var="hcloud_token=${HCLOUD_TOKEN}" -var="ssh_public_key='${SSH_PUBLIC_KEY}'"
+        terraform apply -auto-approve -var="hcloud_token=${HCLOUD_TOKEN}" -var="ssh_public_key=${SSH_PUBLIC_KEY}"
