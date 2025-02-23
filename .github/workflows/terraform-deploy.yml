@@ -10,6 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug Secrets
+        run: |
+          echo "TEST_TOKEN Length: $(echo -n "${{ secrets.TEST_TOKEN }}" | wc -c)"
+          echo "HCLOUD_TOKEN Length: $(echo -n "${{ secrets.HCLOUD_TOKEN }}" | wc -c)"
+          echo "SSH_PUBLIC_KEY Length: $(echo -n "${{ secrets.SSH_PUBLIC_KEY }}" | wc -c)"
+          echo "NON_TOKEN Length: $(echo -n "${{ secrets.NON_TOKEN }}" | wc -c)"
+
       - name: Checkout Repository
         uses: actions/checkout@v3
 
