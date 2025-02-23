@@ -16,21 +16,21 @@ jobs:
           echo "WEATHER_API_URL length: $(echo -n "${{ secrets.WEATHER_API_URL }}" | wc -c)"
           echo "Testing if API URL is set correctly."
 
+      - name: Debug HCLOUD Secret
+        run: |
+          echo "HCCLOUD length: $(echo -n "${{ secrets.HCLOUD_TOKEN }}" | wc -c)"
+          echo "Testing if HCLOUD_TOKEN is set correctly."
+
+      - name: Debug SSH_PUBLIC_KEY Secret
+        run: |
+          echo "HCCLOUD length: $(echo -n "${{ secrets.SSH_PUBLIC_KEY }}" | wc -c)"
+          echo "Testing if SSH_PUBLIC_KEY is set correctly."
+
       - name: Call Weather API
         run: |
           echo "Fetching weather data..."
           RESPONSE=$(curl -s "${{ secrets.WEATHER_API_URL }}")
           echo "API Response: $RESPONSE"
-
-      - name: Check API Response with secret api
-        run: |
-          RESPONSE=$(curl -s "https://wttr.in/Zürich?format=3")
-          if [[ -z "$RESPONSE" ]]; then
-            echo "Error: API response is empty!"
-            exit 1
-          else
-            echo "✅ API call successful!"
-          fi
 
       - name: Check API Response without secret api
         run: |
