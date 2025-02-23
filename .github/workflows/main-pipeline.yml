@@ -1,0 +1,15 @@
+name: Main Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy-infrastructure:
+    uses: ./.github/workflows/terraform-deploy.yml 
+
+  deploy-k3s:
+    needs: deploy-infrastructure
+    uses: ./.github/workflows/k3s-deploy.yml

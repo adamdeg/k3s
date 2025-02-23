@@ -1,0 +1,51 @@
+name: Terraform Deployment
+
+on:
+  workflow_call:  # Kann von einem anderen Workflow getriggert werden
+  workflow_dispatch:  # Erlaubt manuelles Starten
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.6
+
+    - name: Initialize Terraform
+      working-directory: terraform
+      run: terraform init
+
+    - name: Plan Terraform Deployment
+      working-directory: terraform
+      env:
+        HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+      run: terraform plan -var="hcloud_token=$HCLOUD_TOKEN" -var-file="../k3s.tfvars"
+
+  apply:
+    needs: terraform
+    runs-on: ubuntu-latest
+    environment: terraform-apply
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.6
+
+    - name: Initialize Terraform
+      working-directory: terraform
+      run: terraform init
+
+    - name: Apply Terraform Configuration
+      working-directory: terraform
+      env:
+        HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+      run: terraform apply -auto-approve -var="hcloud_token=$HCLOUD_TOKEN" -var-file="../k3s.tfvars"
