@@ -115,7 +115,7 @@ jobs:
 
       - name: Load VM IP
         run: |
-          ls -lah
+          ls -lah ./terraform
           cat ./terraform/vm_ip.txt
           VM_IP=$(cat ./terraform/vm_ip.txt)
           echo "VM IP:"
@@ -125,6 +125,8 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
+          ls -lah ./terraform
+          cat ./terraform/vm_ip.txt
           echo "VM IP:"
           echo $VM_IP
           echo ----
