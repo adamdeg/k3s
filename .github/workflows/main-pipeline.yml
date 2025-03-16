@@ -118,11 +118,16 @@ jobs:
           ls -lah
           cat ./terraform/vm_ip.txt
           VM_IP=$(cat ./terraform/vm_ip.txt)
+          echo "VM IP:"
+          echo $VM_IP
       
       - name: Deploy K3S via SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
+          echo "VM IP:"
+          echo $VM_IP
+          echo ----
           echo "Saving SSH private key..."
           echo "$SSH_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
@@ -132,3 +137,7 @@ jobs:
 
           echo "Executing K3S installation script..."
           ssh -i private_key.pem -o StrictHostKeyChecking=no root@$VM_IP "chmod +x /root/install_k3s.sh && sudo /root/install_k3s.sh"
+
+
+
+          scp -i ~/.ssh/id_rsa root@5.75.171.213:/etc/rancher/k3s/k3s.yaml ~/kubeconfig.yaml
