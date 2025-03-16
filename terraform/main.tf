@@ -1,5 +1,5 @@
 resource "hcloud_ssh_key" "default" {
-  name       = "github-action-key"
+  name       = "github-action-key-${var.server_name}"
   public_key = var.ssh_public_key
 }
 
