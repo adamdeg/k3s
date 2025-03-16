@@ -52,7 +52,7 @@ jobs:
     needs: terraform-plan
     name: "Terraform Apply"
     runs-on: ubuntu-latest
-    environment: production
+    environment: terraform-apply
     defaults:
       run:
         working-directory: ./terraform
@@ -84,7 +84,47 @@ jobs:
       - name: Apply Terraform Configuration
         run: terraform apply -auto-approve "main.tfplan"
 
+      - name: Retrieve VM IP
+        run: |
+          echo "Retrieving VM IP from Terraform output..."
+          VM_IP=$(terraform output -raw vm_ip)
+          echo "$VM_IP" > vm_ip.txt
 
-  # deploy-k3s:
-  #   needs: terraform-apply
-  #   uses: ./.github/workflows/k3s-deploy.yml
+      - name: Save VM IP
+        uses: actions/upload-artifact@v4
+        with:
+          name: vm-ip
+          path: vm_ip.txt
+  
+  deploy-k3s:
+    needs: terraform-apply
+    name: "Deploy K3S"
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Download VM IP
+        uses: actions/download-artifact@v4
+        with:
+          name: vm-ip
+          path: .
+
+      - name: Load VM IP
+        run: echo "VM_IP=$(cat vm_ip.txt)" >> $GITHUB_ENV
+      
+      - name: Deploy K3S via SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "Saving SSH private key..."
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          
+          echo "Copying K3S installation script to the server..."
+          scp -i private_key.pem -o StrictHostKeyChecking=no scripts/install_k3s.sh root@$VM_IP:/root/
+
+          echo "Executing K3S installation script..."
+          ssh -i private_key.pem -o StrictHostKeyChecking=no root@$VM_IP "chmod +x /root/install_k3s.sh && sudo /root/install_k3s.sh"
