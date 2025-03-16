@@ -95,7 +95,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vm-ip
-          path: ./terraform
+          path: .
   
   deploy-k3s:
     needs: terraform-apply
@@ -111,7 +111,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vm-ip
-          path: ./terraform
+          path: .
 
       - name: Load VM IP
         run: |
