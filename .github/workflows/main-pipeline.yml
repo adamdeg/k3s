@@ -95,7 +95,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vm-ip
-          path: .
+          path: ./terraform
   
   deploy-k3s:
     needs: terraform-apply
@@ -111,13 +111,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vm-ip
-          path: .
+          path: ./terraform
 
       - name: Load VM IP
         run: |
           ls -lah
-          cat vm_ip.txt
-          echo "VM_IP=$(cat vm_ip.txt)" >> $GITHUB_ENV
+          cat ./terraform/vm_ip.txt
+          echo "VM_IP=$(cat ./terraform/vm_ip.txt)" >> $GITHUB_ENV
       
       - name: Deploy K3S via SSH
         env:
