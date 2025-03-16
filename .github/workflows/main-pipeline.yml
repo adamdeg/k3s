@@ -51,8 +51,8 @@ jobs:
   terraform-apply:
     needs: terraform-plan
     name: "Terraform Apply"
+    environment: development
     runs-on: ubuntu-latest
-    environment: terraform-apply
     defaults:
       run:
         working-directory: ./terraform
