@@ -117,7 +117,7 @@ jobs:
         run: |
           ls -lah
           cat ./terraform/vm_ip.txt
-          echo "VM_IP=$(cat ./terraform/vm_ip.txt)" >> $GITHUB_ENV
+          VM_IP=$(cat ./terraform/vm_ip.txt)
       
       - name: Deploy K3S via SSH
         env:
