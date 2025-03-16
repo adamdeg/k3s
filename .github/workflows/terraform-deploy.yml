@@ -1,31 +1,46 @@
 name: Terraform Deployment
 
 on:
-  workflow_call:  # Kann von einem anderen Workflow getriggert werden
-  workflow_dispatch:  # Erlaubt manuelles Starten
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.5.6
+      - name: Debug HCLOUD Secret
+        run: |
+          echo "HCCLOUD length: $(echo -n "${{ secrets.HCLOUD_TOKEN }}" | wc -c)"
+          echo "Testing if HCLOUD_TOKEN is set correctly."
 
-    - name: Initialize Terraform
-      working-directory: terraform
-      run: terraform init
+      - name: Debug SSH_PUBLIC_KEY Secret
+        run: |
+          echo "SSH_PUBLIC_KEY length: $(echo -n "${{ secrets.SSH_PUBLIC_KEY }}" | wc -c)"
+          echo "Testing if SSH_PUBLIC_KEY is set correctly."
 
-    - name: Plan Terraform Deployment
-      working-directory: terraform
-      env:
-        HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
-      run: terraform plan -var="hcloud_token=$HCLOUD_TOKEN" -var-file="../k3s.tfvars"
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.6
+
+      - name: Initialize Terraform
+        working-directory: terraform
+        run: terraform init
+
+      - name: Plan Terraform Deployment
+        working-directory: terraform
+        run: |
+          echo "HCCLOUD length: $(echo -n "${{ secrets.HCLOUD_TOKEN }}" | wc -c)"
+          echo "Testing if HCLOUD_TOKEN is set correctly."
+          echo "SSH_PUBLIC_KEY length: $(echo -n "${{ secrets.SSH_PUBLIC_KEY }}" | wc -c)"
+          echo "Testing if SSH_PUBLIC_KEY is set correctly."
+          export TF_VAR_hcloud_token="${{ secrets.HCLOUD_TOKEN }}"
+          export TF_VAR_ssh_public_key="${{ secrets.SSH_PUBLIC_KEY }}"
+          terraform plan
 
   apply:
     needs: terraform
