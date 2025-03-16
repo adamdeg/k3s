@@ -36,13 +36,17 @@ jobs:
         run: terraform init
 
       - name: Plan Terraform Deployment
-        run: terraform plan -out=main.tfplan
+        run: terraform plan -out=main.tfplan || (echo "Terraform plan failed!" && exit 1)
+
+      - name: Check if main.tfplan exists
+        run: ls -lah ./terraform
 
       - name: Save Terraform Plan
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: ./main.tfplan
+          path: ./terraform/main.tfplan
 
   terraform-apply:
     needs: terraform-plan
@@ -74,8 +78,12 @@ jobs:
           name: tfplan
           path: ./terraform
 
+      - name: Check if main.tfplan exists before applying
+        run: ls -lah ./terraform
+
       - name: Apply Terraform Configuration
         run: terraform apply -auto-approve "main.tfplan"
+
 
   # deploy-k3s:
   #   needs: terraform-apply
