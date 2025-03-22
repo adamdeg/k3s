@@ -95,7 +95,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vm-ip
-          path: ./terraform
+          path: ./terraform/vm_ip.txt
+
   
   deploy-k3s:
     needs: terraform-apply
@@ -113,13 +114,18 @@ jobs:
           name: vm-ip
           path: ./terraform
 
-      - name: Load VM IP
+            - name: Load VM IP
         run: |
           ls -lah ./terraform
-          cat ./terraform/vm_ip.txt
-          VM_IP=$(cat ./terraform/vm_ip.txt)
-          echo "VM IP:"
-          echo $VM_IP
+          if [ -f ./terraform/vm_ip.txt ]; then
+            echo "VM IP file exists!"
+            cat ./terraform/vm_ip.txt
+            echo "VM_IP=$(cat ./terraform/vm_ip.txt)" >> $GITHUB_ENV
+          else
+            echo "ERROR: vm_ip.txt not found!"
+            exit 1
+          fi
+
       
       - name: Deploy K3S via SSH
         env:
@@ -142,4 +148,4 @@ jobs:
 
 
 
-          scp -i ~/.ssh/id_rsa root@5.75.171.213:/etc/rancher/k3s/k3s.yaml ~/kubeconfig.yaml
+          # scp -i ~/.ssh/id_rsa root@5.75.171.213:/etc/rancher/k3s/k3s.yaml ~/kubeconfig.yaml
