@@ -1,0 +1,16 @@
+---
+# Server configuration
+cluster-init: {{ 'true' if ansible_hostname == groups['masters'][0] else 'false' }}
+tls-san:
+  - {{ hostvars[groups['masters'][0]]['ansible_host'] }}
+disable:
+  - traefik
+  - servicelb
+  - local-storage
+node-name: {{ ansible_hostname }}
+node-ip: {{ ansible_host }}
+flannel-backend: "host-gw"
+token: "{{ k3s_token | default('') }}"
+{% if groups['masters'] | length > 1 and ansible_hostname != groups['masters'][0] %}
+server: https://{{ hostvars[groups['masters'][0]]['ansible_host'] }}:6443
+{% endif %}

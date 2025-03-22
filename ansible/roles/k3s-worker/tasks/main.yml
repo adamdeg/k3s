@@ -1,0 +1,37 @@
+---
+- name: Get token from master
+  set_fact:
+    k3s_token: "{{ hostvars[groups['masters'][0]]['k3s_token'] }}"
+
+- name: Check if k3s is already installed
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary
+
+- name: Create k3s config directory
+  file:
+    path: /etc/rancher/k3s
+    state: directory
+    mode: '0755'
+
+- name: Create config file for agent
+  copy:
+    content: |
+      server: https://{{ hostvars[groups['masters'][0]]['ansible_host'] }}:6443
+      token: {{ k3s_token }}
+      node-name: {{ ansible_hostname }}
+      node-ip: {{ ansible_host }}
+    dest: /etc/rancher/k3s/config.yaml
+    mode: '0644'
+
+- name: Install k3s agent
+  shell: |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} K3S_URL=https://{{ hostvars[groups['masters'][0]]['ansible_host'] }}:6443 K3S_TOKEN={{ k3s_token }} sh -s - --config /etc/rancher/k3s/config.yaml
+  args:
+    creates: /usr/local/bin/k3s
+  when: not k3s_binary.stat.exists
+
+- name: Wait for node to be ready
+  shell: |
+    sleep 5  # Wait a bit for the agent to connect
+  changed_when: false
