@@ -17,5 +17,4 @@ terraform {
 
 provider "hcloud" {
   token = var.hcloud_token
-  request_timeout = 60
 }
