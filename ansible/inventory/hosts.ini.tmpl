@@ -1,0 +1,18 @@
+[masters]
+%{ for node in master_nodes ~}
+${node.name} ansible_host=${node.ip} ansible_user=root
+%{ endfor ~}
+
+[workers]
+%{ for node in worker_nodes ~}
+${node.name} ansible_host=${node.ip} ansible_user=root
+%{ endfor ~}
+
+[k3s_cluster:children]
+masters
+workers
+
+[k3s_cluster:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+k3s_version=v1.26.1+k3s1
+systemd_dir=/etc/systemd/system
