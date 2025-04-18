@@ -67,6 +67,12 @@ jobs:
         working-directory: ./terraform
         run: terraform validate
 
+      - name: Debug Variables
+        run: |
+          echo "SSH_PUBLIC_KEY is set: ${{ secrets.SSH_PUBLIC_KEY != '' }}"
+          echo "HCLOUD_TOKEN is set: ${{ secrets.HCLOUD_TOKEN != '' }}"
+          echo "SSH_PRIVATE_KEY is set: ${{ secrets.SSH_PRIVATE_KEY != '' }}"
+          
       - name: Terraform Plan
         working-directory: ./terraform
         run: |
@@ -76,7 +82,8 @@ jobs:
             -var="ssh_private_key=${{ secrets.SSH_PRIVATE_KEY }}" \
             -var="ssh_private_key_path=~/.ssh/id_rsa" \
             -var="master_node_count=${{ github.event.inputs.master_nodes }}" \
-            -var="worker_node_count=${{ github.event.inputs.worker_nodes }}"
+            -var="worker_node_count=${{ github.event.inputs.worker_nodes }}" \
+            -out main.tfplan
         if: github.event.inputs.action == 'apply'
 
       - name: Terraform Apply
