@@ -16,6 +16,12 @@ variable "ssh_private_key" {
   default     = "" 
 }
 
+variable "ssh_private_key_path" {
+  description = "Path to SSH private key for Ansible"
+  type        = string
+  default     = "~/.ssh/id_rsa"
+}
+
 variable "cluster_name" {
   description = "Name of the K3S cluster"
   type        = string
