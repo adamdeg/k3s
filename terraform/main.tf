@@ -72,7 +72,7 @@ resource "hcloud_server" "k3s_master" {
     connection {
       type        = "ssh"
       user        = "root"
-      private_key = file(var.ssh_private_key_path)
+      private_key = var.ssh_private_key
       host        = self.ipv4_address
     }
   }

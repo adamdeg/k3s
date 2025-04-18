@@ -9,10 +9,10 @@ variable "ssh_public_key" {
   type        = string
 }
 
-variable "ssh_private_key_path" {
-  description = "Path to SSH private key for Ansible"
+variable "ssh_private_key" {
+  description = "SSH private key content"
   type        = string
-  default     = "~/.ssh/id_rsa"
+  sensitive   = true
 }
 
 variable "cluster_name" {
